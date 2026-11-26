@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""Draw the world news of Tuesday 24 November 2026 as one 1024x1024 image.
+"""Draw the world news of Wednesday 25 November 2026 as one 1024x1024 image.
 
 Pure Python standard library: no Pillow, no network, no randomness.
 Reads fonts.bin (bitmap glyphs extracted from local DejaVu fonts) from the
 same directory, renders six verified news cards onto an RGB framebuffer,
 and writes entry.png (1024x1024) to $MAKEFUN_OUTPUT_DIR (default /output).
 
-The six stories were verified against wire reports (AP, Reuters, AFP,
-Xinhua) on 24 November 2026: each either happened or was first reported
-that day.
+The six stories were verified against wire reports (Reuters, SCMP) on
+25 November 2026: each either happened or was first reported that day.
 """
 
 import math
@@ -42,8 +41,8 @@ CARDS = [
      "REUTERS", "chart"),
     ("SPACE \u00b7 CHINA", NAVY,
      "Shenzhou-24 docks at space station",
-     "Shenzhou-24 docks with the Tiangong station; aboard is Pakistani "
-     "pilot Muhammad Zeeshan Ali, the first foreign astronaut.",
+     "Shenzhou-24 docks at the Tiangong station, carrying Pakistani "
+     "pilot Muhammad Zeeshan Ali, a first foreign astronaut.",
      "SCMP", "globe"),
     ("COURTS \u00b7 US", PLUM,
      "US jury convicts Huawei of fraud",
@@ -406,6 +405,11 @@ def build():
     cw = (W - margin * 2 - gap) // 2
     ch = 261
     top = 172
+    # guard: no headline may exceed its 2 lines and no summary its 3,
+    # so an over-long text fails loudly here instead of clipping silently
+    for card in CARDS:
+        assert len(txt.wrap("bold30", card[2], cw - 36)) <= 2, card[2]
+        assert len(txt.wrap("reg20", card[3], cw - 36)) <= 3, card[2]
     for i, card in enumerate(CARDS):
         col = i % 2
         row = i // 2
